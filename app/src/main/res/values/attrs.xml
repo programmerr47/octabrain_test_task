@@ -2,19 +2,15 @@
 <resources>
 
     <declare-styleable name="CustomFontTextView">
-        <attr name="fontName" format="enum">
-            <enum name="roboto_bold" value="Roboto-Bold"/>
-            <enum name="roboto-medium" value="Roboto-Medium"/>
-            <enum name="roboto-regular" value="Roboto-Regular"/>
-        </attr>
+        <attr name="fontName" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="ParallaxScrollView">
-        <attr name="parallax_factor" format="float" />
-        <attr name="alpha_factor" format="float" />
-        <attr name="inner_parallax_factor" format="float" />
-        <attr name="parallax_views_num" format="integer" />
-        <attr name="circular_parallax" format="boolean" />
+        <attr name="parallax_factor" format="float"/>
+        <attr name="alpha_factor" format="float"/>
+        <attr name="inner_parallax_factor" format="float"/>
+        <attr name="parallax_views_num" format="integer"/>
+        <attr name="circular_parallax" format="boolean"/>
     </declare-styleable>
 
 </resources>
