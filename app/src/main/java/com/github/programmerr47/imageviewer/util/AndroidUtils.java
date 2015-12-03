@@ -5,12 +5,13 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.TypedValue;
 
-import com.github.programmerr47.imageviewer.representation.ImageViewerApplication;
+import static com.github.programmerr47.imageviewer.representation.ImageViewerApplication.getAppContext;
 
 /**
  * Some helpful functions related to android os.
@@ -30,7 +31,7 @@ public class AndroidUtils {
     }
 
     public static float dpToPx(int dp) {
-        return dpToPx(ImageViewerApplication.getAppContext(), dp);
+        return dpToPx(getAppContext(), dp);
     }
 
     public static boolean isNetworkConnected(@NonNull Context context) {
@@ -41,15 +42,31 @@ public class AndroidUtils {
     }
 
     public static boolean isNetworkConnected() {
-        return isNetworkConnected(ImageViewerApplication.getAppContext());
+        return isNetworkConnected(getAppContext());
     }
 
     public static int color(@ColorRes int colorRes) {
-        return color(ImageViewerApplication.getAppContext(), colorRes);
+        return color(getAppContext(), colorRes);
     }
 
     public static int color(@NonNull Context context, @ColorRes int colorRes) {
         Resources r = context.getResources();
         return r.getColor(colorRes);
+    }
+
+    public static String string(@StringRes int stringRes) {
+        return string(getAppContext(), stringRes);
+    }
+
+    public static String string(@NonNull Context context, @StringRes int stringRes) {
+        return context.getString(stringRes);
+    }
+
+    public static float dimen(@DimenRes int dimenRes) {
+        return dimen(getAppContext(), dimenRes);
+    }
+
+    public static float dimen(@NonNull Context context, @DimenRes int dimenRes) {
+        return context.getResources().getDimension(dimenRes);
     }
 }

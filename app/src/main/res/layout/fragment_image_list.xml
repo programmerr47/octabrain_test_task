@@ -1,11 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.github.programmerr47.imageviewer.ImageListActivityFragment"
     tools:showIn="@layout/activity_image_list">
 
@@ -14,4 +11,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-</RelativeLayout>
+    <com.github.programmerr47.imageviewer.representation.view.CustomFontTextView
+        android:id="@+id/empty_images_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/init_images"
+        android:textColor="@color/secondary_text"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:visibility="gone"
+        app:fontName="Roboto-Regular.ttf"/>
+
+    <ProgressBar
+        android:id="@+id/loading_images_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+</FrameLayout>

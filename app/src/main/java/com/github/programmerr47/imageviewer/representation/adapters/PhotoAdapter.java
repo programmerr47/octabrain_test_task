@@ -1,11 +1,14 @@
 package com.github.programmerr47.imageviewer.representation.adapters;
 
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.github.programmerr47.imageviewer.representation.adapters.holders.PhotoItemHolder;
 import com.github.programmerr47.imageviewer.representation.adapters.items.PhotoItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,16 +18,18 @@ import java.util.List;
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoItemHolder> {
 
     private List<PhotoItem> mPhotoItems;
-    private int mItemDimension;
 
-    public PhotoAdapter(List<PhotoItem> photoItems, int itemDimension) {
+    public PhotoAdapter() {
+        this(new ArrayList<PhotoItem>());
+    }
+
+    public PhotoAdapter(@NonNull List<PhotoItem> photoItems) {
         mPhotoItems = photoItems;
-        mItemDimension = itemDimension;
     }
 
     @Override
     public PhotoItemHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return PhotoItem.produce(parent, mItemDimension);
+        return PhotoItem.produce(parent);
     }
 
     @Override
@@ -36,5 +41,15 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoItemHolder> {
     @Override
     public int getItemCount() {
         return mPhotoItems.size();
+    }
+
+    public void updateItems(List<PhotoItem> newItems) {
+        if (mPhotoItems.isEmpty()) {
+            mPhotoItems = newItems;
+            notifyItemRangeInserted(0, newItems.size());
+        } else {
+            mPhotoItems = newItems;
+            notifyDataSetChanged();
+        }
     }
 }

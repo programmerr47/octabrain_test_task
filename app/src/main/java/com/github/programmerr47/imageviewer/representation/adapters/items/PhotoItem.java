@@ -34,7 +34,7 @@ public class PhotoItem {
         holder.getmImageShortDescription().setText(mShortDescr);
     }
 
-    public static PhotoItemHolder produce(ViewGroup parentView, int dimension) {
+    public static PhotoItemHolder produce(ViewGroup parentView) {
         LayoutInflater layoutInflater = LayoutInflater.from(parentView.getContext());
         View view = layoutInflater.inflate(R.layout.item_photo, parentView, false);
 
@@ -42,9 +42,9 @@ public class PhotoItem {
             throw new IllegalStateException("View not created");
         }
 
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        params.width = dimension;
-        params.height = dimension;
+//        ViewGroup.LayoutParams params = view.getLayoutParams();
+//        params.width = dimension;
+//        params.height = dimension;
 
         PhotoItemHolderParams holderParams = new PhotoItemHolderParams();
         holderParams.photoId = R.id.photo;
