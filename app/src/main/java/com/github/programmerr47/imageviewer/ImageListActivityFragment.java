@@ -27,6 +27,9 @@ import com.github.programmerr47.imageviewer.util.AnimationUtils;
 import java.util.List;
 
 import static com.github.programmerr47.imageviewer.util.AndroidUtils.string;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.getShowViewAnimation;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.showView;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.swapViews;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -117,6 +120,7 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     public boolean onQueryTextSubmit(String query) {
         searchItem.collapseActionView();
         searchImages(query);
+        swapViews(emptyView, progressView);
         return true;
     }
 
@@ -141,9 +145,7 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
                 }
             } else {
                 emptyView.setText(string(R.string.no_images));
-                Animator showingAnim = AnimationUtils.getShowViewAnimation(emptyView);
-                Animator hidingAnim = AnimationUtils.getHideViewAnimation(progressView);
-                AnimationUtils.playTogether(showingAnim, hidingAnim);
+                swapViews(progressView, emptyView);
             }
         }
     }

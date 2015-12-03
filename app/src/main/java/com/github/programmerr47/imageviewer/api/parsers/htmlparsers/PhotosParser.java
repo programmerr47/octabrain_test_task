@@ -14,13 +14,14 @@ import java.util.List;
  */
 public class PhotosParser extends HTMLParser<List<PhotoItem>> {
 
-    private static final String IMG_TAG = "img";
+    private static final String CLASS = "class";
+    private static final String SERP_ITEM_TYPE_SEARCH_CLASS = "serp-item_type_search";
 
     private SinglePhotoParser mSinglePhotoParser = new SinglePhotoParser();
 
     @Override
     protected List<PhotoItem> parseObjectFromDoc(Element element) {
-        Elements imgs = element.getElementsByTag(IMG_TAG);
+        Elements imgs = element.getElementsByAttributeValueContaining(CLASS, SERP_ITEM_TYPE_SEARCH_CLASS);
 
         List<PhotoItem> result = new ArrayList<>();
         for (Element img : imgs) {

@@ -173,10 +173,22 @@ public class AnimationUtils {
         return animation;
     }
 
+    public static Animator showView(@NonNull View view) {
+        Animator animation = getShowViewAnimation(view);
+        animation.start();
+        return animation;
+    }
+
     public static Animator hideView(@NonNull View view) {
         Animator animation = getHideViewAnimation(view);
         animation.start();
         return animation;
+    }
+
+    public static void swapViews(View hideView, View showView) {
+        Animator showingAnim = AnimationUtils.getShowViewAnimation(showView);
+        Animator hidingAnim = AnimationUtils.getHideViewAnimation(hideView);
+        AnimationUtils.playTogether(showingAnim, hidingAnim);
     }
 
     public static void playTogether(Animator... animators) {
