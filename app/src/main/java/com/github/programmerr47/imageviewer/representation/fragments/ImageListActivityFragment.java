@@ -14,6 +14,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -133,6 +134,22 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
                         imagesLayoutManager.requestLayout();
                     }
                 });
+
+        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // callback for drag-n-drop, false to skip this feature
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // callback for swipe to dismiss, removing item from data and adapter
+                photoAdapter.remove(viewHolder.getAdapterPosition());
+            }
+        });
+        swipeToDismissTouchHelper.attachToRecyclerView(imagesView);
 
         if (firstTime) {
             emptyView.setVisibility(View.VISIBLE);

@@ -52,4 +52,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoItemHolder> {
             notifyDataSetChanged();
         }
     }
+
+    public void remove(int position) {
+        mPhotoItems.remove(position);
+        notifyItemRemoved(position);
+    }
 }
