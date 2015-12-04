@@ -1,6 +1,8 @@
 package com.github.programmerr47.imageviewer.representation.adapters.items;
 
 import android.net.Uri;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +33,9 @@ public class PhotoItem {
 
     public void bindView(PhotoItemHolder holder, @SuppressWarnings("unused") int position) {
         getImageLoader().displayImage(mPhotoUri.toString(), holder.getImageContainer());
-        holder.getmImageShortDescription().setText(mShortDescr);
+
+        Spanned spannedText = Html.fromHtml(mShortDescr);
+        holder.getmImageShortDescription().setText(spannedText);
     }
 
     public static PhotoItemHolder produce(ViewGroup parentView) {

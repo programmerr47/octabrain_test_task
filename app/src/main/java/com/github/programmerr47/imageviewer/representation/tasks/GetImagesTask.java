@@ -1,6 +1,8 @@
 package com.github.programmerr47.imageviewer.representation.tasks;
 
 
+import android.net.Uri;
+
 import com.github.programmerr47.imageviewer.api.ApiGetMethod;
 import com.github.programmerr47.imageviewer.api.ApiMethod;
 import com.github.programmerr47.imageviewer.api.parsers.htmlparsers.PhotosParser;
@@ -33,7 +35,11 @@ public class GetImagesTask extends AsyncTaskWithListener<String, Void, List<Phot
 
     private ApiMethod<List<PhotoItem>> initApiMethod(String query) {
         return new ApiGetMethod<List<PhotoItem>>()
-                .setUrl("https://yandex.ru/images/search?text=" + query)
+                .setUrl(Uri.parse("https://yandex.ru/images/search?")
+                        .buildUpon()
+                        .appendQueryParameter("text", query)
+                        .build()
+                        .toString())
                 .setMethodResultParser(new PhotosParser());
     }
 }

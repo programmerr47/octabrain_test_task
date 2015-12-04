@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
+<com.github.programmerr47.imageviewer.representation.view.SquareCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
@@ -41,4 +41,4 @@
 
     </FrameLayout>
 
-</android.support.v7.widget.CardView>
+</com.github.programmerr47.imageviewer.representation.view.SquareCardView>

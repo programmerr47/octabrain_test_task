@@ -2,6 +2,7 @@ package com.github.programmerr47.imageviewer.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 
 import com.github.programmerr47.imageviewer.imageloading.cache.MemoryCache;
 
@@ -12,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -22,7 +24,7 @@ public class BitmapUtils {
 
     public static Bitmap getBitmapFromInternet(String url, File file, MemoryCache memoryCache) {
         try {
-            URL imageUrl = new URL(url);
+            URL imageUrl = getUrl(url);
             HttpURLConnection conn = (HttpURLConnection)imageUrl.openConnection();
             conn.setConnectTimeout(1000);
             conn.setReadTimeout(1000);
@@ -40,6 +42,21 @@ public class BitmapUtils {
         }
     }
 
+    private static URL getUrl(String url) throws MalformedURLException {
+        url = fixUrl(url);
+        return new URL(url);
+    }
+
+    private static String fixUrl(String url) {
+        if (url.startsWith("http://")) {
+            return url;
+        } else if (url.startsWith("//")) {
+            return "http:" + url;
+        } else {
+            return "http://" + url;
+        }
+    }
+
     public static Bitmap decodeFile(File file) {
         if (!file.isDirectory()) {
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -47,7 +64,7 @@ public class BitmapUtils {
             try {
                 return BitmapFactory.decodeStream(new FileInputStream(file), null, options);
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
                 return null;
             }
         } else {

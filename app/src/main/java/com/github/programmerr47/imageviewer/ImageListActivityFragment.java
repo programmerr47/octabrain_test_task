@@ -28,6 +28,7 @@ import java.util.List;
 
 import static com.github.programmerr47.imageviewer.util.AndroidUtils.string;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.getShowViewAnimation;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.hideView;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.showView;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.swapViews;
 
@@ -120,7 +121,13 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     public boolean onQueryTextSubmit(String query) {
         searchItem.collapseActionView();
         searchImages(query);
-        swapViews(emptyView, progressView);
+
+        if (emptyView.getVisibility() == View.VISIBLE) {
+            swapViews(emptyView, progressView);
+        } else {
+            swapViews(imagesView, progressView);
+        }
+
         return true;
     }
 
@@ -137,12 +144,14 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
 
             if (!newItems.isEmpty()) {
                 if (progressView.getVisibility() == View.VISIBLE) {
-                    AnimationUtils.hideView(progressView);
+                    hideView(progressView);
                 }
 
                 if (emptyView.getVisibility() == View.VISIBLE) {
-                    AnimationUtils.hideView(emptyView);
+                    hideView(emptyView);
                 }
+
+                showView(imagesView);
             } else {
                 emptyView.setText(string(R.string.no_images));
                 swapViews(progressView, emptyView);
