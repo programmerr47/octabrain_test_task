@@ -30,4 +30,22 @@
         android:layout_gravity="center"
         android:visibility="gone"/>
 
+    <FrameLayout
+        android:id="@+id/connection_state_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/connection_state_height"
+        android:background="@color/wrong_state">
+
+        <com.github.programmerr47.imageviewer.representation.view.CustomFontTextView
+            android:id="@+id/connection_state_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/waiting_for_connection"
+            android:textColor="@color/primary_text_dark"
+            android:textSize="15sp"
+            app:fontName="Roboto-Regular.ttf"/>
+
+    </FrameLayout>
+
 </FrameLayout>

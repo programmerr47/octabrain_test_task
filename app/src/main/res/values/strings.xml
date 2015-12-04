@@ -1,8 +1,17 @@
 <resources>
+    <!-- APP -->
     <string name="app_name">Image Viewer</string>
 
+    <!-- NETWORK STATUSES -->
+    <string name="network_connected">Network connected</string>
+    <string name="waiting_for_connection">Waiting for connection&#8230;</string>
+
+    <!-- SEARCH -->
     <string name="action_search">Search</string>
     <string name="search_hint">Criteria of image</string>
+
+    <!-- EMPTY LIST LABELS -->
     <string name="no_images">No images are found for your query.\nPlease, specify another one.</string>
     <string name="init_images">Click on search icon\nand\nwrite your search query in search field</string>
+    <string name="null_images">Oops...Something happened during connection\nPossibly you have no internet connection</string>
 </resources>

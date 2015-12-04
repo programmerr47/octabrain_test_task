@@ -2,15 +2,18 @@ package com.github.programmerr47.imageviewer.representation.fragments;
 
 import android.animation.Animator;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,14 +29,19 @@ import com.github.programmerr47.imageviewer.representation.adapters.PhotoAdapter
 import com.github.programmerr47.imageviewer.representation.adapters.items.PhotoItem;
 import com.github.programmerr47.imageviewer.representation.tasks.AsyncTaskWithListener;
 import com.github.programmerr47.imageviewer.representation.tasks.GetImagesTask;
-import com.github.programmerr47.imageviewer.util.AnimationUtils;
+import com.github.programmerr47.imageviewer.util.AndroidUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Intent.ACTION_SEARCH;
+import static com.github.programmerr47.imageviewer.util.AndroidUtils.color;
+import static com.github.programmerr47.imageviewer.util.AndroidUtils.dpToPx;
+import static com.github.programmerr47.imageviewer.util.AndroidUtils.isNetworkConnected;
 import static com.github.programmerr47.imageviewer.util.AndroidUtils.string;
-import static com.github.programmerr47.imageviewer.util.AnimationUtils.getShowViewAnimation;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.hideView;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.showAndHideSuccessNetworkState;
+import static com.github.programmerr47.imageviewer.util.AnimationUtils.showNetworkState;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.showView;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.swapViews;
 
@@ -45,6 +53,8 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     private RecyclerView imagesView;
     private TextView emptyView;
     private ProgressBar progressView;
+    private View networkStateContainer;
+    private TextView connectionStateLabel;
 
     private PhotoAdapter photoAdapter;
 
@@ -52,6 +62,24 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     private MenuItem searchItem;
 
     private boolean firstTime = true;
+    private Boolean isNetworkConnected;
+
+    private Animator networkStateAnimation;
+
+    private BroadcastReceiver networkStateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+                boolean isNetworkConnected = isNetworkConnected();
+                changeConnectionStateViews(isNetworkConnected);
+
+                if (isNetworkConnected != ImageListActivityFragment.this.isNetworkConnected) {
+                    runProperNetworkAnimation(isNetworkConnected);
+                    ImageListActivityFragment.this.isNetworkConnected = isNetworkConnected;
+                }
+            }
+        }
+    };
 
     public ImageListActivityFragment() {
     }
@@ -75,11 +103,19 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
         imagesView = (RecyclerView) view.findViewById(R.id.image_list);
         emptyView = (TextView) view.findViewById(R.id.empty_images_label);
         progressView = (ProgressBar) view.findViewById(R.id.loading_images_progress);
+        networkStateContainer = view.findViewById(R.id.connection_state_container);
+        connectionStateLabel = (TextView) view.findViewById(R.id.connection_state_label);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (networkStateAnimation != null && networkStateAnimation.isStarted()) {
+            networkStateAnimation.end();
+        }
+
+        ViewCompat.setElevation(networkStateContainer, dpToPx(3));
 
         final GridLayoutManager imagesLayoutManager = new GridLayoutManager(getActivity(), 1);
         imagesView.setLayoutManager(imagesLayoutManager);
@@ -114,6 +150,33 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        boolean isNetworkConnected = AndroidUtils.isNetworkConnected();
+        changeConnectionStateViews(isNetworkConnected);
+        if (this.isNetworkConnected == null || this.isNetworkConnected != isNetworkConnected) {
+            runProperNetworkAnimation(isNetworkConnected);
+        } else if (!isNetworkConnected) {
+            networkStateContainer.setY(0);
+        } else {
+            if (networkStateAnimation == null || !networkStateAnimation.isStarted()) {
+                networkStateContainer.setVisibility(View.INVISIBLE);
+            }
+        }
+        this.isNetworkConnected = isNetworkConnected;
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        getActivity().registerReceiver(networkStateReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(networkStateReceiver);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_image_list, menu);
 
@@ -126,13 +189,22 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     @Override
     public boolean onQueryTextSubmit(String query) {
         searchItem.collapseActionView();
-        searchImages(query);
-        launchQuerySearch(query);
 
-        if (emptyView.getVisibility() == View.VISIBLE) {
-            swapViews(emptyView, progressView);
+        if (isNetworkConnected) {
+            if (emptyView.getVisibility() == View.VISIBLE) {
+                swapViews(emptyView, progressView);
+            } else {
+                swapViews(imagesView, progressView);
+            }
+
+            searchImages(query);
+            launchQuerySearch(query);
         } else {
-            swapViews(imagesView, progressView);
+            photoAdapter.updateItems(new ArrayList<PhotoItem>());
+            emptyView.setText(string(R.string.null_images));
+            if (emptyView.getVisibility() != View.VISIBLE) {
+                swapViews(imagesView, emptyView);
+            }
         }
 
         return true;
@@ -147,21 +219,27 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     public void onTaskFinished(String taskName, Object extraObject) {
         if (taskName.equals(GetImagesTask.class.getName())) {
             List<PhotoItem> newItems = (List<PhotoItem>) extraObject;
-            photoAdapter.updateItems(newItems);
 
-            if (!newItems.isEmpty()) {
-                if (progressView.getVisibility() == View.VISIBLE) {
-                    hideView(progressView);
-                }
-
-                if (emptyView.getVisibility() == View.VISIBLE) {
-                    hideView(emptyView);
-                }
-
-                showView(imagesView);
-            } else {
-                emptyView.setText(string(R.string.no_images));
+            if (newItems == null) {
+                emptyView.setText(string(R.string.null_images));
                 swapViews(progressView, emptyView);
+            } else {
+                photoAdapter.updateItems(newItems);
+
+                if (!newItems.isEmpty()) {
+                    if (progressView.getVisibility() == View.VISIBLE) {
+                        hideView(progressView);
+                    }
+
+                    if (emptyView.getVisibility() == View.VISIBLE) {
+                        hideView(emptyView);
+                    }
+
+                    showView(imagesView);
+                } else {
+                    emptyView.setText(string(R.string.no_images));
+                    swapViews(progressView, emptyView);
+                }
             }
         }
     }
@@ -208,5 +286,27 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     private String getSuggestionByPosition(int position) {
         Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
         return cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
+    }
+
+    private void changeConnectionStateViews(boolean isNetworkConnected) {
+        if (isNetworkConnected) {
+            connectionStateLabel.setText(string(R.string.network_connected));
+            networkStateContainer.setBackgroundDrawable(new ColorDrawable(color(R.color.good_state)));
+        } else {
+            connectionStateLabel.setText(string(R.string.waiting_for_connection));
+            networkStateContainer.setBackgroundDrawable(new ColorDrawable(color(R.color.wrong_state)));
+        }
+    }
+
+    private void runProperNetworkAnimation(boolean isNetworkConnected) {
+        if (networkStateAnimation != null && networkStateAnimation.isStarted()) {
+            networkStateAnimation.cancel();
+        }
+
+        if (isNetworkConnected) {
+            networkStateAnimation = showAndHideSuccessNetworkState(networkStateContainer, 0);
+        } else {
+            networkStateAnimation = showNetworkState(networkStateContainer, 0);
+        }
     }
 }
