@@ -14,5 +14,5 @@
     <!-- EMPTY LIST LABELS -->
     <string name="no_images">No images are found for your query.\nPlease, specify another one.</string>
     <string name="init_images">Click on search icon\nand\nwrite your search query in search field</string>
-    <string name="null_images">Oops...Something happened during connection\nPossibly you have no internet connection</string>
+    <string name="null_images">Oops&#8230;Something happened during connection\nPossibly you have no internet connection</string>
 </resources>
