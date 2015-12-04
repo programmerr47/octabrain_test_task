@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- APP -->
+    <string name="app_name">Поисковик изображений</string>
+
+    <!-- NETWORK STATUSES -->
+    <string name="network_connected">Сеть подключена</string>
+    <string name="waiting_for_connection">Ожидание подключения&#8230;</string>
+
+    <!-- SEARCH -->
+    <string name="action_search">Поиск</string>
+    <string name="search_hint">Введите описание картинки</string>
+
+    <!-- EMPTY LIST LABELS -->
+    <string name="no_images">Не найдено изображений для вашего запроса.\nПожалуйста, введите другой запрос.</string>
+    <string name="init_images">Нажмите на лупу\nи\nнапишите свой поисковый запрос</string>
+    <string name="null_images">Упс...Что-то произошло в процессе обработки\nВозможно у вас отсутствует подключение к сети</string>
+</resources>
