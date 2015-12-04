@@ -1,13 +1,16 @@
-package com.github.programmerr47.imageviewer;
+package com.github.programmerr47.imageviewer.representation.fragments;
 
 import android.animation.Animator;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +21,7 @@ import android.view.ViewTreeObserver;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.programmerr47.imageviewer.R;
 import com.github.programmerr47.imageviewer.representation.adapters.PhotoAdapter;
 import com.github.programmerr47.imageviewer.representation.adapters.items.PhotoItem;
 import com.github.programmerr47.imageviewer.representation.tasks.AsyncTaskWithListener;
@@ -26,6 +30,7 @@ import com.github.programmerr47.imageviewer.util.AnimationUtils;
 
 import java.util.List;
 
+import static android.content.Intent.ACTION_SEARCH;
 import static com.github.programmerr47.imageviewer.util.AndroidUtils.string;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.getShowViewAnimation;
 import static com.github.programmerr47.imageviewer.util.AnimationUtils.hideView;
@@ -35,7 +40,7 @@ import static com.github.programmerr47.imageviewer.util.AnimationUtils.swapViews
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ImageListActivityFragment extends Fragment implements SearchView.OnQueryTextListener, AsyncTaskWithListener.OnTaskFinishedListener {
+public class ImageListActivityFragment extends Fragment implements SearchView.OnQueryTextListener, AsyncTaskWithListener.OnTaskFinishedListener, SearchView.OnSuggestionListener {
 
     private RecyclerView imagesView;
     private TextView emptyView;
@@ -43,6 +48,7 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
 
     private PhotoAdapter photoAdapter;
 
+    SearchView searchView;
     private MenuItem searchItem;
 
     private boolean firstTime = true;
@@ -121,6 +127,7 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
     public boolean onQueryTextSubmit(String query) {
         searchItem.collapseActionView();
         searchImages(query);
+        launchQuerySearch(query);
 
         if (emptyView.getVisibility() == View.VISIBLE) {
             swapViews(emptyView, progressView);
@@ -159,9 +166,20 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
         }
     }
 
+    @Override
+    public boolean onSuggestionSelect(int position) {
+        return false;
+    }
+
+    @Override
+    public boolean onSuggestionClick(int position) {
+        String query = getSuggestionByPosition(position);
+        onQueryTextSubmit(query);
+        return true;
+    }
+
     private void initSearchViewInMenuItem(MenuItem searchItem) {
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = null;
 
         if (searchItem != null) {
             searchView = (SearchView) searchItem.getActionView();
@@ -169,6 +187,7 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
         if (searchView != null) {
             searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
             searchView.setOnQueryTextListener(this);
+            searchView.setOnSuggestionListener(this);
         }
     }
 
@@ -176,5 +195,18 @@ public class ImageListActivityFragment extends Fragment implements SearchView.On
         GetImagesTask imagesTask = new GetImagesTask();
         imagesTask.setOnTaskFinishedListener(this);
         imagesTask.execute(query);
+    }
+
+    private void launchQuerySearch(String query) {
+        Intent intent = new Intent(ACTION_SEARCH);
+        intent.putExtra(SearchManager.QUERY, query);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setComponent(getActivity().getComponentName());
+        getContext().startActivity(intent);
+    }
+
+    private String getSuggestionByPosition(int position) {
+        Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
+        return cursor.getString(cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_TEXT_1));
     }
 }
